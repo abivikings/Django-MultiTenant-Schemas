@@ -8,6 +8,7 @@ from rest_auth.views import LoginView as RestLoginView
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.hashers import make_password
 
+# views will goes to here
 
 def get_tokens_for_user(user):
     refresh = RefreshToken.for_user(user)
