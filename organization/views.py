@@ -2,13 +2,15 @@ from rest_framework import viewsets, status
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
+
+from hrgini import settings
 from .models import Users
 from .serializers import *
 from rest_auth.views import LoginView as RestLoginView
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.hashers import make_password
+from django.core.mail import send_mail
 
-# views will goes to here
 
 def get_tokens_for_user(user):
     refresh = RefreshToken.for_user(user)
@@ -49,6 +51,12 @@ class UserViewSet(viewsets.ModelViewSet):
         serializer = UserSerializer(data=request.data, context=serializer_context)
         if serializer.is_valid():
             User.objects.create(username=request.data['username'], password=make_password(request.data['password']), email=request.data['email'], is_staff=True, is_active=True)
+            subject = "Welcome"
+            message = 'Test Link'
+
+            # send the email to the recipent
+            send_mail(subject, message,
+                      settings.DEFAULT_FROM_EMAIL, [request.data['email']])
             return Response({'status': 'User Created'})
         else:
             return Response(serializer.errors,

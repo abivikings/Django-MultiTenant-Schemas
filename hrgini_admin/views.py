@@ -1,15 +1,21 @@
 from django.contrib.auth.hashers import make_password
 from django.db import connection
 from rest_framework import viewsets, status
-from django.contrib.auth.models import User
-from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from rest_framework.decorators import api_view
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from django.contrib.auth.models import User
-from .serializers import OrganizationSerializer, OrganizationPublicSerializer
+from hrgini import settings
+from .serializers import OrganizationSerializer, OrganizationPublicSerializer, ApplicantSerializer
 from .models import Organization, Domain
-from organization.models import Users
+from django.core.mail import send_mail
+from applicant.models import Profile
+
+
+@api_view(['GET'])
+def ApplicantPublicView(request, username):
+    applicant_profile = Profile.objects.filter(username)
+    return Response(status=status.HTTP_200_OK)
 
 
 @api_view(['post'])
@@ -17,13 +23,29 @@ def OrganizationViewSetPublic(request):
     serializer_context = {
         'request': request,
     }
-    serializer = OrganizationPublicSerializer(data=request.data, context=serializer_context)
-    if serializer.is_valid():
-        serializer.save()
-        return Response({'status': 'Data Submitted. Please Wait for admin approval.'})
-    else:
-        return Response(serializer.errors,
-                        status=status.HTTP_400_BAD_REQUEST)
+    if serializer_context['request'].data['type'] == 'organization':
+        serializer = OrganizationPublicSerializer(data=request.data, context=serializer_context)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({'status': 'Data Submitted. Please Wait for admin approval.'})
+        else:
+            return Response(serializer.errors,
+                            status=status.HTTP_400_BAD_REQUEST)
+    if serializer_context['request'].data['type'] == 'applicant':
+        serializer = ApplicantSerializer(data=request.data, context=serializer_context)
+        if serializer.is_valid():
+            serializer = User(first_name=request.data['name'], email=request.data['email'], password=make_password('12345'))
+            serializer.save()
+            subject = "Welcome"
+            message = 'Test Link'
+
+            # send the email to the recipent
+            send_mail(subject, message,
+                      settings.DEFAULT_FROM_EMAIL, [request.data['email']])
+            return Response({'status': 'Registrations Successful. Please check your Email'})
+        else:
+            return Response(serializer.errors,
+                            status=status.HTTP_400_BAD_REQUEST)
 
 
 class OrganizationViewSet(viewsets.ModelViewSet):

@@ -22,6 +22,7 @@ schema_view = get_swagger_view(title='HR Gini API')
 urlpatterns = [
     path('', include('hrgini_admin.urls')),
     path('', include('organization.urls')),
+    path('applicant/', include('applicant.urls')),
     path('', include('blog.urls')),
     path('api-docs/', schema_view, name='api-docs')
 ]

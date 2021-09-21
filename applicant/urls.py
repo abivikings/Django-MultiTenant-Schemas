@@ -1,12 +1,12 @@
 from django.urls import path, include
 from rest_framework import routers, serializers, viewsets
+
 from .views import *
+from django.contrib import admin
 
 router = routers.DefaultRouter()
-router.register(r'organizations', OrganizationViewSet)
+router.register(r'profile', ApplicantProfileViewSet)
 
 urlpatterns = [
-    path('registration/', OrganizationViewSetPublic, name='registration'),
-    path('<username>', OrganizationViewSetPublic, name='registration'),
     path('', include(router.urls)),
 ]

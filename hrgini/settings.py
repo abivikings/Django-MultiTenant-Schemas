@@ -39,16 +39,17 @@ SHARED_APPS = (
     'django.contrib.messages',
     'django.contrib.admin',
     'rest_framework_swagger',
+    'applicant',
 )
 
 TENANT_APPS = (
     'django.contrib.contenttypes',
+    'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.staticfiles',
     'django.contrib.sessions',
     'rest_framework',
     'django.contrib.messages',
-    'django.contrib.admin',
     'organization',
     'blog',
     'rest_framework_swagger',
@@ -167,4 +168,11 @@ REST_AUTH_SERIALIZERS = {
     'LOGIN_SERIALIZER': 'organization.serializers.LoginSerializer',
 }
 
-AUTHENTICATION_BACKENDS = ['path.to.auth.module.EmailBackend']
+DEFAULT_FROM_EMAIL = 'sojibsorker@gmail.com'
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'sojibsorker@gmail.com'
+EMAIL_HOST_PASSWORD = 'Sojib948873'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
